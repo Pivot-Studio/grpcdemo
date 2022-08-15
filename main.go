@@ -6,52 +6,60 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"proto-test/gen/hello_servicepb"
 	"proto-test/interceptor"
+	"proto-test/internal/hello"
+	"proto-test/pkg/boot"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// server is used to implement helloworld.GreeterServer.
-type server struct {
-	hello_servicepb.UnimplementedHelloServiceServer
-}
-
-// SayHello implements helloworld.GreeterServer
-func (s *server) SayHello(ctx context.Context, in *hello_servicepb.HelloRequest) (*hello_servicepb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &hello_servicepb.HelloReply{Message: "Hello " + in.GetName()}, nil
-}
-
 func main() {
-	go func() {
-		lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
-		if err != nil {
-			log.Fatalf("failed to listen: %v", err)
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatalf("panic: %v", err)
 		}
-		s := grpc.NewServer(getServerOpts()...)
-		hello_servicepb.RegisterHelloServiceServer(s, &server{})
-		s.Serve(lis)
 	}()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 9000))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer(getServerOpts()...)
+	registerGRPC(s)
+	go func() {
+		err := s.Serve(lis)
+		if err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
 	opts := getDialOpts()
 	gwmux := runtime.NewServeMux()
-	hello_servicepb.RegisterHelloServiceHandlerFromEndpoint(context.Background(), gwmux, "localhost:9000", opts)
-
+	err = boot.RegisterGWs(context.Background(), gwmux, fmt.Sprintf("localhost:%d", 9000), opts)
+	if err != nil {
+		log.Fatalf("failed to register ep: %v", err)
+	}
 	fs := http.FileServer(http.Dir("./swaggerui"))
 	h := http.StripPrefix("/swaggerui/", fs)
 	mux := http.NewServeMux()
 	mux.Handle("/", gwmux)
 	mux.Handle("/swaggerui/", h)
-	http.ListenAndServe(":8080", mux)
+	err = http.ListenAndServe(":8080", mux)
+	if err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
 
+func registerGRPC(s *grpc.Server) {
+	hello.RegisterHelloWordService(s)
 }
 
 func getServerOpts() []grpc.ServerOption {
 	return []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(interceptor.GetUnaryInterceptors()...),
 		grpc.ChainStreamInterceptor(),
+		grpc.InTapHandle(interceptor.GetTapHandler()),
 	}
 }
 

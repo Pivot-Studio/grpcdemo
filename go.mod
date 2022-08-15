@@ -3,6 +3,7 @@ module proto-test
 go 1.18
 
 require (
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.1
 	golang.org/x/time v0.0.0-20220722155302-e5dcc9cfc0b9
 	google.golang.org/genproto v0.0.0-20220728213248-dd149ef739b9

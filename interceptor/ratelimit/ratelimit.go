@@ -1,4 +1,4 @@
-package interceptor
+package ratelimit
 
 import (
 	"context"
@@ -8,13 +8,13 @@ import (
 	"sync"
 
 	"golang.org/x/time/rate"
-	"google.golang.org/grpc"
+	"google.golang.org/grpc/tap"
 )
 
 var sm = sync.Map{}
 
-func deadline(ctx context.Context, req interface{},
-	info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+// RateLimit is a unary server interceptor that adds ratelimit to the context.
+func RateLimit(ctx context.Context, info *tap.Info) (context.Context, error) {
 	ip := grpchelper.GetIP(ctx)
 	var limiter *rate.Limiter
 	limiterI, ok := sm.Load(ip)
@@ -30,5 +30,5 @@ func deadline(ctx context.Context, req interface{},
 		log.Printf("ip %s is too frequent", ip)
 		return nil, errwraper.Simple("too frequent", errwraper.ErrTooFrequent)
 	}
-	return handler(ctx, req)
+	return ctx, nil
 }
