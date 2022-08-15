@@ -1,8 +1,8 @@
 package hello
 
 import (
-	"proto-test/gen/hello_servicepb"
-	"proto-test/pkg/boot"
+	"github.com/Pivot-Studio/grpcdemo/gen/hello_servicepb"
+	"github.com/Pivot-Studio/grpcdemo/pkg/boot"
 
 	"google.golang.org/grpc"
 )

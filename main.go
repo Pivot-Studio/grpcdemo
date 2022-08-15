@@ -6,9 +6,10 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"proto-test/interceptor"
-	"proto-test/internal/hello"
-	"proto-test/pkg/boot"
+
+	"github.com/Pivot-Studio/grpcdemo/interceptor"
+	"github.com/Pivot-Studio/grpcdemo/internal/hello"
+	"github.com/Pivot-Studio/grpcdemo/pkg/boot"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"

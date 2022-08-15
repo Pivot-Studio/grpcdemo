@@ -3,7 +3,8 @@ package hello
 import (
 	"context"
 	"log"
-	"proto-test/gen/hello_servicepb"
+
+	"github.com/Pivot-Studio/grpcdemo/gen/hello_servicepb"
 )
 
 // server is used to implement helloworld.GreeterServer.

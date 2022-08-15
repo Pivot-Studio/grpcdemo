@@ -1,10 +1,10 @@
 package interceptor
 
 import (
-	"proto-test/interceptor/deadline"
-	"proto-test/interceptor/trace"
+	"github.com/Pivot-Studio/grpcdemo/interceptor/deadline"
+	"github.com/Pivot-Studio/grpcdemo/interceptor/trace"
 
-	"proto-test/interceptor/ratelimit"
+	"github.com/Pivot-Studio/grpcdemo/interceptor/ratelimit"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/tap"

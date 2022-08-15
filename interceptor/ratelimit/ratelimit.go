@@ -3,9 +3,10 @@ package ratelimit
 import (
 	"context"
 	"log"
-	"proto-test/errwraper"
-	"proto-test/pkg/grpchelper"
 	"sync"
+
+	"github.com/Pivot-Studio/grpcdemo/errwraper"
+	"github.com/Pivot-Studio/grpcdemo/pkg/grpchelper"
 
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc/tap"

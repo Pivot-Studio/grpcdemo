@@ -1,4 +1,4 @@
-module proto-test
+module github.com/Pivot-Studio/grpcdemo
 
 go 1.18
 
